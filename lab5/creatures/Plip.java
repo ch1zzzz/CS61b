@@ -1,5 +1,6 @@
 package creatures;
 
+import edu.princeton.cs.algs4.StdRandom;
 import huglife.Creature;
 import huglife.Direction;
 import huglife.Action;
@@ -8,6 +9,8 @@ import huglife.Occupant;
 import java.awt.Color;
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
 
 /**
@@ -35,9 +38,9 @@ public class Plip extends Creature {
      */
     public Plip(double e) {
         super("plip");
-        r = 0;
-        g = 0;
-        b = 0;
+        r = 99;
+        g = (int) (96 * e +63);
+        b = 76;
         energy = e;
     }
 
@@ -57,7 +60,7 @@ public class Plip extends Creature {
      * that you get this exactly correct.
      */
     public Color color() {
-        g = 63;
+        g = (int) (96 * energy +63);;
         return color(r, g, b);
     }
 
@@ -74,7 +77,11 @@ public class Plip extends Creature {
      * private static final variable. This is not required for this lab.
      */
     public void move() {
-        // TODO
+        if (energy<0.15) {
+            energy = 0;
+        } else {
+            energy -= 0.15;
+        }
     }
 
 
@@ -82,7 +89,11 @@ public class Plip extends Creature {
      * Plips gain 0.2 energy when staying due to photosynthesis.
      */
     public void stay() {
-        // TODO
+        if (energy>1.8) {
+            energy = 2;
+        } else {
+            energy += 0.2;
+        }
     }
 
     /**
@@ -91,7 +102,9 @@ public class Plip extends Creature {
      * Plip.
      */
     public Plip replicate() {
-        return this;
+        Plip offspring = new Plip(0.5 * this.energy());
+        energy = 0.5 * energy;
+        return offspring;
     }
 
     /**
@@ -108,23 +121,28 @@ public class Plip extends Creature {
      * for an example to follow.
      */
     public Action chooseAction(Map<Direction, Occupant> neighbors) {
-        // Rule 1
-        Deque<Direction> emptyNeighbors = new ArrayDeque<>();
-        boolean anyClorus = false;
-        // TODO
-        // (Google: Enhanced for-loop over keys of NEIGHBORS?)
-        // for () {...}
 
-        if (false) { // FIXME
-            // TODO
+        List<Direction> emptyNeighbors = new ArrayList<>();
+        for (Direction i : neighbors.keySet()) {
+            if (neighbors.get(i).name().equals("empty")) {
+                emptyNeighbors.add(i);
+            }
         }
-
-        // Rule 2
-        // HINT: randomEntry(emptyNeighbors)
-
-        // Rule 3
-
-        // Rule 4
-        return new Action(Action.ActionType.STAY);
+        int size = emptyNeighbors.size();
+        boolean anyClorus = false;
+        if (emptyNeighbors.isEmpty()) {
+            return new Action(Action.ActionType.STAY);
+        } else if (energy >= 1) {
+            int r = StdRandom.uniform(size);
+            Direction d = emptyNeighbors.get(r);
+            return new Action(Action.ActionType.REPLICATE, d);
+        } else if (anyClorus && Math.random()<0.5) {
+            int r = StdRandom.uniform(size);
+            Direction d = emptyNeighbors.get(r);
+            return new Action(Action.ActionType.MOVE, d);
+        } else {
+            return new Action(Action.ActionType.STAY);
+        }
     }
+
 }
