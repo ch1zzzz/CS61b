@@ -123,13 +123,17 @@ public class Plip extends Creature {
     public Action chooseAction(Map<Direction, Occupant> neighbors) {
 
         List<Direction> emptyNeighbors = new ArrayList<>();
+        List<Direction> clorusNeighbors = new ArrayList<>();
+        boolean anyClorus = false;
         for (Direction i : neighbors.keySet()) {
             if (neighbors.get(i).name().equals("empty")) {
                 emptyNeighbors.add(i);
+            } else if (neighbors.get(i).name().equals("clorus")) {
+                clorusNeighbors.add(i);
+                anyClorus = true;
             }
         }
         int size = emptyNeighbors.size();
-        boolean anyClorus = false;
         if (emptyNeighbors.isEmpty()) {
             return new Action(Action.ActionType.STAY);
         } else if (energy >= 1) {
