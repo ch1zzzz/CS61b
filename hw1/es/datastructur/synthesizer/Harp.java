@@ -1,9 +1,6 @@
 package es.datastructur.synthesizer;
 
-//Note: This file will not compile until you complete task 1 (BoundedQueue).
-public class GuitarString {
-    /** Constants. Do not change. In case you're curious, the keyword final
-     * means the values cannot be changed at runtime. */
+public class Harp {
     private static final int SR = 44100;      // Sampling Rate
     private static final double DECAY = .996; // energy decay factor
 
@@ -11,12 +8,9 @@ public class GuitarString {
     private BoundedQueue<Double> buffer;
 
     /* Create a guitar string of the given frequency.  */
-    public GuitarString(double frequency) {
-        // TODO: Create a buffer with capacity = SR / frequency. You'll need to
-        //       cast the result of this division operation into an int. For
-        //       better accuracy, use the Math.round() function before casting.
-        //       Your buffer should be initially filled with zeros.
-        int capacity = (int) Math.round(SR / frequency);
+    public Harp(double frequency) {
+
+        int capacity = (int) Math.round(SR / frequency * 2);
         buffer = new ArrayRingBuffer<>(capacity);
         for (int i = 0; i<capacity; i++) {
             buffer.enqueue(0.0);
@@ -40,13 +34,11 @@ public class GuitarString {
      * the Karplus-Strong algorithm.
      */
     public void tic() {
-        // TODO: Dequeue the front sample and enqueue a new sample that is
-        //       the average of the two multiplied by the DECAY factor.
-        //       Do not call StdAudio.play().
+        
         double f = buffer.dequeue();
         double s = buffer.peek();
         double a = (f + s) * 0.5 * DECAY;
-        buffer.enqueue(a);
+        buffer.enqueue(-a);
     }
 
     /* Return the double at the front of the buffer. */
@@ -55,4 +47,3 @@ public class GuitarString {
         return buffer.peek();
     }
 }
-    // TODO: Remove all comments that say TODO when you're done.

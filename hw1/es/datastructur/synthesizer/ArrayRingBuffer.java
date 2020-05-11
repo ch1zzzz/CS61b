@@ -4,9 +4,7 @@ import java.util.Objects;
 
 import static org.junit.Assert.assertFalse;
 
-//TODO: Make sure to that this class and all of its methods are public
-//TODO: Make sure to add the override tag for all overridden methods
-//TODO: Make sure to make this class implement BoundedQueue<T>
+
 
 public class ArrayRingBuffer<T> implements BoundedQueue<T>, Iterable<T> {
     /* Index for the next dequeue or peek. */
@@ -88,6 +86,7 @@ public class ArrayRingBuffer<T> implements BoundedQueue<T>, Iterable<T> {
 
     }
 
+    /** create an arb iterator. */
     public class ArbIterator implements Iterator<T> {
         private int pos = 0;
         @Override
@@ -103,28 +102,28 @@ public class ArrayRingBuffer<T> implements BoundedQueue<T>, Iterable<T> {
         }
     }
 
+    /** call the arb iterator. */
     public Iterator<T> iterator() {
         return new ArbIterator();
     }
 
-    public static void main(String[] args) {
-        ArrayRingBuffer<Double> arb = new ArrayRingBuffer(4);
-        arb.enqueue(9.3);
-        arb.enqueue(15.1);
-        arb.enqueue(31.2);
-        arb.enqueue(-3.1);
-        Iterator<Double> arbIter = arb.iterator();
-        while (arbIter.hasNext()) {
-            double i = arbIter.next();
-            System.out.println(i);
-        }
-        for (double i : arb) {
-            System.out.println(i);
-        }
 
-
+    /** override the equals method from Object. */
+    @Override
+    public boolean equals (Object other) {
+        ArrayRingBuffer<T> o = (ArrayRingBuffer<T>) other;
+        if (o.fillCount() != this.fillCount) {
+            return false;
+        }
+        Iterator<T> a = this.iterator();
+        Iterator<T> b = o.iterator();
+        for (int i = 0; i<fillCount; i++){
+            if (!a.next().equals(b.next())) {
+                return false;
+            }
+        }
+        return true;
     }
-    // TODO: When you get to part 4, implement the needed code to support
-    //       iteration and equals.
+
 }
-    // TODO: Remove all comments that say TODO when you're done.
+
