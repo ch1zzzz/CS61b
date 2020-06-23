@@ -15,7 +15,26 @@ public class ExperimentHelper {
      *  N = 8, OIPL: 13
      */
     public static int optimalIPL(int N) {
-        return 0;
+        int optimalIPL = 0;
+        int sum = 0;
+        int i = 0;
+        int j = 0;
+        while (sum < N) {
+            sum += Math.pow(2, i);
+            i+=1;
+        }
+        i -= 1;
+        sum -= Math.pow(2, i);
+        while (j <= i-1) {
+            optimalIPL += (Math.pow(2, j) * j);
+            j+=1;
+        }
+        optimalIPL += (i * (N + 1 - Math.pow(2, i)));
+        return optimalIPL;
+    }
+
+    public static void main(String[] args) {
+        System.out.println(optimalAverageDepth(5));
     }
 
     /** Returns the average depth for nodes in an optimal BST of
@@ -27,6 +46,17 @@ public class ExperimentHelper {
      * @return
      */
     public static double optimalAverageDepth(int N) {
-        return 0;
+        double optimalIPL = optimalIPL(N);
+        return optimalIPL / N;
+    }
+
+    public static void randomInsert(BST<Integer> bst) {
+        int random = RandomGenerator.getRandomInt(10000);
+        while (true) {
+            if (!bst.contains(random)) {
+                bst.add(random);
+                break;}
+            else {random = RandomGenerator.getRandomInt(10000);}
+        }
     }
 }
