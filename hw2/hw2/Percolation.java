@@ -1,21 +1,22 @@
 package hw2;
 
 import edu.princeton.cs.algs4.WeightedQuickUnionUF;
-import java.lang.*;
 
 public class Percolation {
 
-    int length;
-    int numberOfOpenSites = 0;
-    WeightedQuickUnionUF uf;
-    WeightedQuickUnionUF uf2;
-    private int site[];
-    int top = length * length;
-    int bottom = length * length + 1;
+    private int length;
+    private int numberOfOpenSites = 0;
+    private WeightedQuickUnionUF uf;
+    private WeightedQuickUnionUF uf2;
+    private int[] site;
+    private int top = length * length;
+    private int bottom = length * length + 1;
 
     // create N-by-N grid, with all sites initially blocked
     public Percolation(int N) {
-        if (N<0) {throw new IllegalArgumentException();}
+        if (N < 0) {
+            throw new IllegalArgumentException();
+        }
         length = N;
         uf = new WeightedQuickUnionUF(N * N + 2);
         uf2 = new WeightedQuickUnionUF(N * N + 2);
@@ -28,10 +29,13 @@ public class Percolation {
 
     // open the site (row, col) if it is not open already
     public void open(int row, int col) {
-        if(row<0 || col<0 || row>=length || col>=length) throw new IndexOutOfBoundsException();
+        if (row<0 || col<0 || row>=length || col>=length) {
+            throw new IndexOutOfBoundsException();
+        }
         int ID = xyToID(row, col);
-        if (site[ID] == 1) {return;}
-        else {
+        if (site[ID] == 1) {
+            return;
+        } else {
             site[ID] = 1;
             numberOfOpenSites += 1;
         }
@@ -61,13 +65,20 @@ public class Percolation {
 
     // is the site (row, col) open?
     public boolean isOpen(int row, int col) {
-        if(row<0 || col<0 || row>=length || col>=length) throw new IndexOutOfBoundsException();
+        if (row<0 || col<0 || row>=length || col>=length) {
+            throw new IndexOutOfBoundsException();
+        }
         return site[xyToID(row, col)] == 1;
     }
 
     // is the site (row, col) full?
     public boolean isFull(int row, int col) {
-        if(row<0 || col<0 || row>=length || col>=length) throw new IndexOutOfBoundsException();
+        if (row < 0 || col < 0 || row >= length || col >= length) {
+            throw new IndexOutOfBoundsException();
+        }
+        if (!isOpen(row, col)) {
+            return false;
+        }
         int ID = xyToID(row, col);
         return uf2.connected(top, ID);
     }
