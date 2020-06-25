@@ -29,11 +29,15 @@ public class Percolation {
         return row * length + col;
     }
 
-    // open the site (row, col) if it is not open already
-    public void open(int row, int col) {
+    private void validate(int row, int col) {
         if (row < 0 || col < 0 || row >= length || col >= length) {
             throw new IndexOutOfBoundsException();
         }
+    }
+
+    // open the site (row, col) if it is not open already
+    public void open(int row, int col) {
+        validate(row, col);
 
         if (!isOpen(row, col)) {
             int id = xyToID(row, col);
@@ -67,17 +71,13 @@ public class Percolation {
 
     // is the site (row, col) open?
     public boolean isOpen(int row, int col) {
-        if (row < 0 || col < 0 || row >= length || col >= length) {
-            throw new IndexOutOfBoundsException();
-        }
+        validate(row, col);
         return grid[row][col];
     }
 
     // is the site (row, col) full?
     public boolean isFull(int row, int col) {
-        if (row < 0 || col < 0 || row >= length || col >= length) {
-            throw new IndexOutOfBoundsException();
-        }
+        validate(row, col);
         if (!isOpen(row, col)) {
             return false;
         }
