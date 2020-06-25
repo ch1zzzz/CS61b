@@ -4,95 +4,93 @@ import edu.princeton.cs.algs4.WeightedQuickUnionUF;
 
 public class Percolation {
 
-    private int length;
-    private int numberOfOpenSites = 0;
+    private boolean[][] grid;
+    private int size;
+    private int top;
+    private int bottom;
     private WeightedQuickUnionUF uf;
-    private WeightedQuickUnionUF uf2;
-    private int[] site;
-    private int top = length * length;
-    private int bottom = length * length + 1;
+    private WeightedQuickUnionUF ufExcludeBottom; // to avoid backwash
+    private int numOpenSites = 0;
+    private int[][] surroundings = new int[][]{{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
 
     // create N-by-N grid, with all sites initially blocked
     public Percolation(int N) {
-        if (N < 0) {
+        if (N <= 0) {
             throw new IllegalArgumentException();
         }
-        length = N;
+        grid = new boolean[N][N];
+        size = N;
+        top = 0; // virtual top node
+        bottom = N * N + 1; // virtual bottom node
         uf = new WeightedQuickUnionUF(N * N + 2);
-        uf2 = new WeightedQuickUnionUF(N * N + 2);
-        site = new int[N * N];
+        ufExcludeBottom = new WeightedQuickUnionUF(N * N + 1);
     }
 
+    // transform (row, col) to 1D coordinate
+    private int xyTo1D(int row, int col) {
+        return row * size + col + 1;
+    }
 
-    private int xyToID(int row, int col) {
-        return row * length + col;
+    // validate the validity of (row, col)
+    private void validate(int row, int col) {
+        if (row < 0 || col < 0 || row >= size || col >= size) {
+            throw new IndexOutOfBoundsException();
+        }
     }
 
     // open the site (row, col) if it is not open already
     public void open(int row, int col) {
-        if (row < 0 || col < 0 || row >= length || col >= length) {
-            throw new IndexOutOfBoundsException();
-        }
-
+        validate(row, col);
         if (!isOpen(row, col)) {
-            int id = xyToID(row, col);
-            site[id] = 1;
-            numberOfOpenSites += 1;
-            unionOpen(row, col);
+            grid[row][col] = true;
+            numOpenSites += 1;
         }
-    }
-
-    private void unionOpen(int row, int col) {
-        int id = xyToID(row, col);
-
         if (row == 0) {
-            uf.union(top, id);
-            uf2.union(top, id);
+            uf.union(xyTo1D(row, col), top);
+            ufExcludeBottom.union(xyTo1D(row, col), top);
         }
-
-        if (row == length - 1) {
-            uf2.union(bottom, id);
+        if (row == size - 1) {
+            uf.union(xyTo1D(row, col), bottom);
         }
-
-        int[][] temp = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
-        for (int[] i : temp) {
-            i[0] = i[0] + row;
-            i[1] = i[1] + col;
-            if (0 <= i[0] && i[0] < length && 0 <= i[1] && i[1] < length && isOpen(i[0], i[1])) {
-                uf.union(id, xyToID(i[0], i[1]));
-                uf2.union(id, xyToID(i[0], i[1]));
+        for (int[] surrounding : surroundings) {
+            int adjacentRow = row + surrounding[0];
+            int adjacentCol = col + surrounding[1];
+            if (adjacentRow >= 0 && adjacentRow < size) {
+                if (adjacentCol >= 0 && adjacentCol < size) {
+                    if (isOpen(adjacentRow, adjacentCol)) {
+                        uf.union(xyTo1D(row, col), xyTo1D(adjacentRow, adjacentCol));
+                        ufExcludeBottom.union(xyTo1D(row, col), xyTo1D(adjacentRow, adjacentCol));
+                    }
+                }
             }
         }
     }
 
     // is the site (row, col) open?
     public boolean isOpen(int row, int col) {
-        if (row < 0 || col < 0 || row >= length || col >= length) {
-            throw new IndexOutOfBoundsException();
-        }
-        return site[xyToID(row, col)] == 1;
+        validate(row, col);
+        return grid[row][col];
     }
 
     // is the site (row, col) full?
     public boolean isFull(int row, int col) {
-        if (row < 0 || col < 0 || row >= length || col >= length) {
-            throw new IndexOutOfBoundsException();
-        }
-        if (!isOpen(row, col)) {
-            return false;
-        }
-        int id = xyToID(row, col);
-        return uf.connected(top, id);
+        validate(row, col);
+        return ufExcludeBottom.connected(xyTo1D(row, col), top);
     }
 
+    // number of open sites
     public int numberOfOpenSites() {
-        return numberOfOpenSites;
+        return numOpenSites;
     }
 
+    // does the system percolate?
     public boolean percolates() {
-        return uf2.connected(top, bottom);
+        return uf.connected(top, bottom);
     }
 
-    public static void main(String[] args) {}
     // use for unit testing (not required, but keep this here for the autograder)
+    public static void main(String[] args) {
+
+    }
+
 }
