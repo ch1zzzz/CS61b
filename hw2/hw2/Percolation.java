@@ -59,6 +59,7 @@ public class Percolation {
             i[1] = i[1] + col;
             if (0<=i[0] && i[0]<length && 0<=i[1] && i[1] <length && isOpen(i[0], i[1])) {
                 uf.union(ID, xyToID(i[0], i[1]));
+                uf2.union(ID, xyToID(i[0], i[1]));
             }
         }
     }
