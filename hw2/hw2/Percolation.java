@@ -93,6 +93,8 @@ public class Percolation {
         return uf2.connected(top, bottom);
     }
 
-    public static void main(String[] args) { }
+    public static void main(String[] args) {
+
+    }
     // use for unit testing (not required, but keep this here for the autograder)
 }
