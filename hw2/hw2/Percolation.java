@@ -21,15 +21,8 @@ public class Percolation {
         uf = new WeightedQuickUnionUF(N * N + 2);
         uf2 = new WeightedQuickUnionUF(N * N + 2);
         site = new int[N * N];
-
-        for (int i = 0; i < N - 1; i++) {
-            uf.union(top, i);
-            uf2.union(top, i);
-        }
-        for (int i = (N - 1) * N; i < N * N - 1; i++) {
-            uf2.union(bottom, i);
-        }
     }
+
 
     private int xyToID(int row, int col) {
         return row * length + col;
@@ -52,6 +45,15 @@ public class Percolation {
 
     private void unionOpen(int row, int col) {
         int ID = xyToID(row, col);
+
+        if (row == 0) {
+            uf.union(top, ID);
+            uf2.union(top, ID);
+        }
+
+        if (row == length - 1) {
+            uf2.union(bottom, ID);
+        }
 
         int[][] temp = {{0,1}, {0,-1}, {1,0}, {-1,0}};
         for (int[] i : temp) {
