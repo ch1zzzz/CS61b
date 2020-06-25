@@ -21,6 +21,14 @@ public class Percolation {
         uf = new WeightedQuickUnionUF(N * N + 2);
         uf2 = new WeightedQuickUnionUF(N * N + 2);
         site = new int[N * N];
+
+        for (int i = 0; i < N - 1; i++) {
+            uf.union(top, i);
+            uf2.union(top, i);
+        }
+        for (int i = (N - 1) * N; i < N * N - 1; i++) {
+            uf2.union(bottom, i);
+        }
     }
 
     private int xyToID(int row, int col) {
@@ -29,7 +37,7 @@ public class Percolation {
 
     // open the site (row, col) if it is not open already
     public void open(int row, int col) {
-        if (row<0 || col<0 || row>=length || col>=length) {
+        if (row < 0 || col < 0 || row >= length || col >= length) {
             throw new IndexOutOfBoundsException();
         }
         int ID = xyToID(row, col);
@@ -44,14 +52,6 @@ public class Percolation {
 
     private void unionOpen(int row, int col) {
         int ID = xyToID(row, col);
-        if (row == 0) {
-            uf.union(ID, top);
-            uf2.union(ID, top);
-        }
-
-        if (row == length - 1) {
-            uf.union(ID, bottom);
-        }
 
         int[][] temp = {{0,1}, {0,-1}, {1,0}, {-1,0}};
         for (int[] i : temp) {
@@ -80,7 +80,7 @@ public class Percolation {
             return false;
         }
         int ID = xyToID(row, col);
-        return uf2.connected(top, ID);
+        return uf.connected(top, ID);
     }
 
     public int numberOfOpenSites() {
@@ -88,7 +88,7 @@ public class Percolation {
     }
 
     public boolean percolates() {
-        return uf.connected(top, bottom);
+        return uf2.connected(top, bottom);
     }
 
     public static void main(String[] args) {} // use for unit testing (not required, but keep this here for the autograder)
