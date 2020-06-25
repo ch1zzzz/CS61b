@@ -33,42 +33,41 @@ public class Percolation {
         if (row < 0 || col < 0 || row >= length || col >= length) {
             throw new IndexOutOfBoundsException();
         }
-        int ID = xyToID(row, col);
-        if (site[ID] == 1) {
-            return;
-        } else {
-            site[ID] = 1;
+
+        if (!isOpen(row, col)) {
+            int id = xyToID(row, col);
+            site[id] = 1;
             numberOfOpenSites += 1;
+            unionOpen(row, col);
         }
-        unionOpen(row, col);
     }
 
     private void unionOpen(int row, int col) {
-        int ID = xyToID(row, col);
+        int id = xyToID(row, col);
 
         if (row == 0) {
-            uf.union(top, ID);
-            uf2.union(top, ID);
+            uf.union(top, id);
+            uf2.union(top, id);
         }
 
         if (row == length - 1) {
-            uf2.union(bottom, ID);
+            uf2.union(bottom, id);
         }
 
-        int[][] temp = {{0,1}, {0,-1}, {1,0}, {-1,0}};
+        int[][] temp = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
         for (int[] i : temp) {
             i[0] = i[0] + row;
             i[1] = i[1] + col;
-            if (0<=i[0] && i[0]<length && 0<=i[1] && i[1] <length && isOpen(i[0], i[1])) {
-                uf.union(ID, xyToID(i[0], i[1]));
-                uf2.union(ID, xyToID(i[0], i[1]));
+            if (0 <= i[0] && i[0] < length && 0 <= i[1] && i[1] < length && isOpen(i[0], i[1])) {
+                uf.union(id, xyToID(i[0], i[1]));
+                uf2.union(id, xyToID(i[0], i[1]));
             }
         }
     }
 
     // is the site (row, col) open?
     public boolean isOpen(int row, int col) {
-        if (row<0 || col<0 || row>=length || col>=length) {
+        if (row < 0 || col < 0 || row >= length || col >= length) {
             throw new IndexOutOfBoundsException();
         }
         return site[xyToID(row, col)] == 1;
@@ -82,8 +81,8 @@ public class Percolation {
         if (!isOpen(row, col)) {
             return false;
         }
-        int ID = xyToID(row, col);
-        return uf.connected(top, ID);
+        int id = xyToID(row, col);
+        return uf.connected(top, id);
     }
 
     public int numberOfOpenSites() {
@@ -94,5 +93,6 @@ public class Percolation {
         return uf2.connected(top, bottom);
     }
 
-    public static void main(String[] args) {} // use for unit testing (not required, but keep this here for the autograder)
+    public static void main(String[] args) {}
+    // use for unit testing (not required, but keep this here for the autograder)
 }

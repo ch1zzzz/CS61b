@@ -1,5 +1,4 @@
 package hw2;
-import java.lang.*;
 import edu.princeton.cs.algs4.StdRandom;
 import edu.princeton.cs.introcs.StdStats;
 
@@ -10,10 +9,12 @@ public class PercolationStats {
 
     // perform T independent experiments on an N-by-N grid
     public PercolationStats(int N, int T, PercolationFactory pf) {
-        if (N <= 0 || T <= 0) throw new IllegalArgumentException();
+        if (N <= 0 || T <= 0) {
+            throw new IllegalArgumentException();
+        }
         threshold = new double[T];
         length = T;
-        for (int i = 0; i<T; i++) {
+        for (int i = 0; i < T; i++) {
             int count = 0;
             Percolation per = pf.make(N);
             while (!per.percolates()) {
