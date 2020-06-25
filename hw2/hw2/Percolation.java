@@ -8,9 +8,10 @@ public class Percolation {
     private int numberOfOpenSites = 0;
     private WeightedQuickUnionUF uf;
     private WeightedQuickUnionUF uf2;
-    private int[] site;
+    private boolean[][] grid;
     private int top = length * length;
     private int bottom = length * length + 1;
+    int[][] surround = new int[][]{{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
 
     // create N-by-N grid, with all sites initially blocked
     public Percolation(int N) {
@@ -20,7 +21,7 @@ public class Percolation {
         length = N;
         uf = new WeightedQuickUnionUF(N * N + 2);
         uf2 = new WeightedQuickUnionUF(N * N + 2);
-        site = new int[N * N];
+        grid = new boolean[N][N];
     }
 
 
@@ -36,7 +37,7 @@ public class Percolation {
 
         if (!isOpen(row, col)) {
             int id = xyToID(row, col);
-            site[id] = 1;
+            grid[row][col] = true;
             numberOfOpenSites += 1;
             unionOpen(row, col);
         }
@@ -54,11 +55,10 @@ public class Percolation {
             uf2.union(bottom, id);
         }
 
-        int[][] temp = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
-        for (int[] i : temp) {
-            i[0] = i[0] + row;
-            i[1] = i[1] + col;
-            if (0 <= i[0] && i[0] < length && 0 <= i[1] && i[1] < length && isOpen(i[0], i[1])) {
+        for (int[] i : surround) {
+            int row_sur = i[0] + row;
+            int col_sur = i[1] + col;
+            if (0 <= row_sur && row_sur < length && 0 <= col_sur && col_sur < length && isOpen(row_sur, col_sur)) {
                 uf.union(id, xyToID(i[0], i[1]));
                 uf2.union(id, xyToID(i[0], i[1]));
             }
@@ -70,7 +70,7 @@ public class Percolation {
         if (row < 0 || col < 0 || row >= length || col >= length) {
             throw new IndexOutOfBoundsException();
         }
-        return site[xyToID(row, col)] == 1;
+        return grid[row][col];
     }
 
     // is the site (row, col) full?
@@ -93,6 +93,6 @@ public class Percolation {
         return uf2.connected(top, bottom);
     }
 
-    public static void main(String[] args) {}
+    public static void main(String[] args) { }
     // use for unit testing (not required, but keep this here for the autograder)
 }
