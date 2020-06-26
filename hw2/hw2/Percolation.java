@@ -1,5 +1,7 @@
 package hw2;
 
+import edu.princeton.cs.algs4.In;
+import edu.princeton.cs.algs4.StdDraw;
 import edu.princeton.cs.algs4.WeightedQuickUnionUF;
 
 public class Percolation {
@@ -7,10 +9,10 @@ public class Percolation {
     private int length;
     private int numberOfOpenSites = 0;
     private WeightedQuickUnionUF uf;
-    private WeightedQuickUnionUF uf2;
+    private WeightedQuickUnionUF ufNoBottom;
     private boolean[][] grid;
-    private int top = length * length;
-    private int bottom = length * length + 1;
+    private int top;
+    private int bottom;
     private int[][] surround = new int[][]{{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
 
     // create N-by-N grid, with all sites initially blocked
@@ -19,14 +21,16 @@ public class Percolation {
             throw new IllegalArgumentException();
         }
         length = N;
+        top = 0;
+        bottom = N * N + 1;
+        ufNoBottom = new WeightedQuickUnionUF(N * N + 1);
         uf = new WeightedQuickUnionUF(N * N + 2);
-        uf2 = new WeightedQuickUnionUF(N * N + 2);
         grid = new boolean[N][N];
     }
 
 
     private int xyToID(int row, int col) {
-        return row * length + col;
+        return row * length + col + 1;
     }
 
     private void validate(int row, int col) {
@@ -40,7 +44,6 @@ public class Percolation {
         validate(row, col);
 
         if (!isOpen(row, col)) {
-            int id = xyToID(row, col);
             grid[row][col] = true;
             numberOfOpenSites += 1;
             unionOpen(row, col);
@@ -52,11 +55,11 @@ public class Percolation {
 
         if (row == 0) {
             uf.union(top, id);
-            uf2.union(top, id);
+            ufNoBottom.union(top, id);
         }
 
         if (row == length - 1) {
-            uf2.union(bottom, id);
+            uf.union(bottom, id);
         }
 
         for (int[] i : surround) {
@@ -65,7 +68,7 @@ public class Percolation {
             if (0 <= adjacentRow && adjacentRow < length && 0 <= adjacentCol
                     && adjacentCol < length && isOpen(adjacentRow, adjacentCol)) {
                 uf.union(id, xyToID(adjacentRow, adjacentCol));
-                uf2.union(id, xyToID(adjacentRow, adjacentCol));
+                ufNoBottom.union(id, xyToID(adjacentRow, adjacentCol));
             }
         }
     }
@@ -79,11 +82,8 @@ public class Percolation {
     // is the site (row, col) full?
     public boolean isFull(int row, int col) {
         validate(row, col);
-        if (!isOpen(row, col)) {
-            return false;
-        }
         int id = xyToID(row, col);
-        return uf.connected(top, id);
+        return ufNoBottom.connected(top, id);
     }
 
     public int numberOfOpenSites() {
@@ -91,7 +91,7 @@ public class Percolation {
     }
 
     public boolean percolates() {
-        return uf2.connected(top, bottom);
+        return uf.connected(top, bottom);
     }
 
     public static void main(String[] args) {
