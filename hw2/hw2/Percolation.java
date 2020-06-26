@@ -19,7 +19,7 @@ public class Percolation {
             throw new IllegalArgumentException();
         }
         length = N;
-        top = 0;
+        top = N * N;
         bottom = N * N + 1;
         ufNoBottom = new WeightedQuickUnionUF(N * N + 1);
         uf = new WeightedQuickUnionUF(N * N + 2);
@@ -28,7 +28,7 @@ public class Percolation {
 
 
     private int xyToID(int row, int col) {
-        return row * length + col + 1;
+        return row * length + col;
     }
 
     private void validate(int row, int col) {
