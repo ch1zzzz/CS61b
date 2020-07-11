@@ -1,0 +1,2 @@
+HashMap is more faster than ULLMap
+100000 items of length 10 about 1s;
