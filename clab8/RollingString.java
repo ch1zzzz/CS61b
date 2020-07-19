@@ -1,3 +1,5 @@
+import java.util.ArrayDeque;
+
 /**
  * A String-like class that allows users to add and remove characters in the String
  * in constant time and have a constant-time hash function. Used for the Rabin-Karp
@@ -17,13 +19,19 @@ class RollingString{
      */
     static final int PRIMEBASE = 6113;
 
+    private ArrayDeque<Character> stringDeque;
+
     /**
      * Initializes a RollingString with a current value of String s.
      * s must be the same length as the maximum length.
      */
     public RollingString(String s, int length) {
         assert(s.length() == length);
-        /* FIX ME */
+        stringDeque = new ArrayDeque<>();
+        char[] chars=s.toCharArray();
+        for (char c : chars) {
+            stringDeque.add(c);
+        }
     }
 
     /**
@@ -32,7 +40,8 @@ class RollingString{
      * Should be a constant-time operation.
      */
     public void addChar(char c) {
-        /* FIX ME */
+        stringDeque.add(c);
+        stringDeque.pollFirst();
     }
 
 
@@ -43,8 +52,10 @@ class RollingString{
      */
     public String toString() {
         StringBuilder strb = new StringBuilder();
-        /* FIX ME */
-        return "";
+        for (char c : stringDeque) {
+            strb.append(c);
+        }
+        return strb.toString();
     }
 
     /**
@@ -53,7 +64,7 @@ class RollingString{
      */
     public int length() {
         /* FIX ME */
-        return -1;
+        return stringDeque.size();
     }
 
 
@@ -65,7 +76,7 @@ class RollingString{
     @Override
     public boolean equals(Object o) {
         /* FIX ME */
-        return false;
+        return this.toString().equals(o.toString());
     }
 
     /**
@@ -74,7 +85,10 @@ class RollingString{
      */
     @Override
     public int hashCode() {
-        /* FIX ME */
-        return -1;
+        int hash = 0;
+        for (char c : stringDeque) {
+            hash = (hash * UNIQUECHARS + (int) c) % PRIMEBASE;
+        }
+        return hash;
     }
 }
