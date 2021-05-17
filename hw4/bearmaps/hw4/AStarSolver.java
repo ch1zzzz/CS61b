@@ -3,6 +3,9 @@ import bearmaps.proj2ab.DoubleMapPQ;
 import bearmaps.proj2ab.ExtrinsicMinPQ;
 import edu.princeton.cs.algs4.Stopwatch;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 public class AStarSolver<Vertex> implements ShortestPathsSolver<Vertex> {
     /***
@@ -19,15 +22,78 @@ public class AStarSolver<Vertex> implements ShortestPathsSolver<Vertex> {
      */
 
     private SolverOutcome outcome;
-    private double solutionWeight;
-    private List<Vertex> solution;
+    private double solutionWeight = 0;
+    private LinkedList<Vertex> solution;
     private double timeSpent;
+    private int numStatesExplored;
+
+    private ExtrinsicMinPQ<Vertex> fringe;
+    private HashMap<Vertex, Double> distTo;
+    private HashMap<Vertex, Vertex> edgeTo;
 
     public AStarSolver(AStarGraph<Vertex> input, Vertex start, Vertex end, double timeout) {
         Stopwatch sw = new Stopwatch();
-        /// new hashdict, distTo, edgeTo, int n, 每遍历一个新的v, +dict, n++,dist/edgeTO 修改
-        ExtrinsicMinPQ<Vertex> pq = new DoubleMapPQ<>();
+        fringe = new DoubleMapPQ<>();
+        distTo = new HashMap<>();
+        edgeTo = new HashMap<>();
+        solution = new LinkedList<>();
 
+        distTo.put(start, 0.0);
+        fringe.add(start, 0.0);
+        while (fringe.size() != 0) {
+            Vertex p = fringe.getSmallest();
+
+            //1. find the path in time
+            if(p.equals(end)) {
+                outcome = SolverOutcome.SOLVED;
+                timeSpent = sw.elapsedTime();
+                solutionWeight = distTo.get(p);
+                solution.add(p);
+                while (!p.equals(start)) {
+                    p = edgeTo.get(p);
+                    solution.addFirst(p);
+                }
+                return;
+            }
+
+            //2. time run out
+            if (sw.elapsedTime() > timeout) {
+                outcome = SolverOutcome.TIMEOUT;
+                timeSpent = sw.elapsedTime();
+                return;
+            }
+
+            // relax all the edge from p
+            fringe.removeSmallest();
+            numStatesExplored += 1;
+            List<WeightedEdge<Vertex>> pNeighbors = input.neighbors(p);
+            for (WeightedEdge<Vertex> neighbor : pNeighbors) {
+                relax(neighbor, input, end);
+            }
+        }
+
+        //3. fringe is empty and can't find the path
+        outcome = SolverOutcome.UNSOLVABLE;
+        timeSpent = sw.elapsedTime();
+    }
+
+    private void relax(WeightedEdge<Vertex> neighbor, AStarGraph<Vertex> input, Vertex end) {
+        Vertex p = neighbor.from();
+        Vertex q = neighbor.to();
+        double w = neighbor.weight();
+        double dis = distTo.get(p);
+        if (!distTo.containsKey(q)) {
+            distTo.put(q, Double.POSITIVE_INFINITY);
+        }
+        if (dis + w < distTo.get(q)) {
+            distTo.replace(q, dis + w);
+            edgeTo.put(q, p);
+            if (fringe.contains(q)) {
+                fringe.changePriority(q, distTo.get(q) + input.estimatedDistanceToGoal(q, end));
+            } else {
+                fringe.add(q, distTo.get(q) + input.estimatedDistanceToGoal(q, end));
+            }
+        }
     }
 
     @Override
@@ -47,11 +113,11 @@ public class AStarSolver<Vertex> implements ShortestPathsSolver<Vertex> {
 
     @Override
     public int numStatesExplored() {
-        return 1;
+        return numStatesExplored;
     }
 
     @Override
     public double explorationTime() {
-        return 1;
+        return timeSpent;
     }
 }
